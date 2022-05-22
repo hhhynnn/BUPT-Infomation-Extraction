@@ -1,8 +1,8 @@
+import { spawn } from "child_process";
 import Koa from "koa";
 import Router from "koa-router";
 import staticResource from "koa-static";
 import path from "path";
-import { spawn } from "child_process";
 
 const app = new Koa();
 const router = new Router();
