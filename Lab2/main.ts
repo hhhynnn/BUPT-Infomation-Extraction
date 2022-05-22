@@ -1,3 +1,4 @@
+import { spawn } from "child_process";
 import Koa from "koa";
 import Router from "koa-router";
 import staticResource from "koa-static";
@@ -7,13 +8,22 @@ const app = new Koa();
 const router = new Router();
 
 router.redirect("/", "/index.html");
-app.use(router.routes()).use(staticResource(path.join(__dirname, "app/build")));
 
 router.get("/api/search", async ctx => {
-  const keyword = ctx.query.q;
+  const keyword = ctx.query.q as string;
   console.log(keyword);
-  ctx.response.body = `查找关键词：${keyword}`;
+  const pythonProcess = spawn("python", ["api/test.py", keyword]);
+
+  let data = "";
+  for await (const chunk of pythonProcess.stdout) {
+    console.log("stdout chunk: " + chunk);
+    data += chunk;
+  }
+
+  ctx.response.body = `${keyword}: ${data}`;
 });
+
+app.use(router.routes()).use(staticResource(path.join(__dirname, "app/build")));
 
 app.listen(8080);
 

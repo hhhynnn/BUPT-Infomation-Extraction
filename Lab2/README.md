@@ -21,6 +21,20 @@ cd Lab2
 yarn
 ```
 
+## 安装前端第三方包
+
+```shell
+cd Lab2/app
+yarn
+```
+
+## 编译前端静态网站
+
+```shell
+cd Lab2/app
+yarn build
+```
+
 # 运行
 
 ## 启动服务器
