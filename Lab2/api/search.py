@@ -102,14 +102,17 @@ def search_by_tfidf():
         seg_list = seg_dict[f'{k}']
         word_set = set(seg_list)
         # 统计 tf 和 df
-        for keyword in keywords:
-            tf_dict[k][keyword] = seg_list.count(keyword)
+        for word in keywords:
+            tf_dict[k][word] = seg_list.count(word)
     # 计算 idf
     article_set = set(article_ids)
     doc_cnt = len(article_ids)  # 文章个数
-    for keyword in keywords:
-        doc_set = set(index[keyword])
-        idf_dict[keyword] = math.log10(doc_cnt / len(doc_set & article_set))
+    for word in keywords:
+        try:
+            doc_set = set(index[word])
+        except KeyError:
+            doc_set = set()
+        idf_dict[word] = math.log10(doc_cnt / (1 + len(doc_set & article_set)))
 
     # 计算 tf-idf 向量
     tfidf_vec_dict = defaultdict(list)
