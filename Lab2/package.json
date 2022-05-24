@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "main": "main.js",
   "license": "MIT",
+  "scripts": {
+    "serve": "ts-node main.ts",
+    "dev": "nodemon -e ts main.ts"
+  },
   "dependencies": {
     "koa": "^2.13.4",
     "koa-router": "^10.1.1",
@@ -12,6 +16,7 @@
     "@types/koa": "^2.13.4",
     "@types/koa-router": "^7.4.4",
     "@types/koa-static": "^4.0.2",
-    "@types/node": "^17.0.35"
+    "@types/node": "^17.0.35",
+    "nodemon": "^2.0.16"
   }
 }
