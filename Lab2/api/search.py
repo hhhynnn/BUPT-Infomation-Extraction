@@ -34,6 +34,7 @@ from collections import defaultdict
 import jieba
 from config import CACHE_PATH
 
+sys.stdout.reconfigure(encoding='utf-8')
 # 获取搜索关键词
 mode = sys.argv[1]
 keywords_ori = sys.argv[2]

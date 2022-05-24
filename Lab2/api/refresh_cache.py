@@ -44,4 +44,3 @@ for article in articles:
 with open(CACHE_PATH, 'w', encoding='utf8') as f:
     d = {'index': iv_index, 'seg': seg_dict}
     f.write(json.dumps(d, ensure_ascii=False))
-

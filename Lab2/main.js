@@ -31,10 +31,13 @@ router.get("/api/search", (ctx) => __awaiter(void 0, void 0, void 0, function* (
     var e_1, _a;
     const keyword = ctx.query.q;
     console.log(keyword);
-    const pythonProcess = (0, child_process_1.spawn)("python", ["api/test.py", keyword]);
+    const search = (0, child_process_1.spawn)("python", ["search.py", "tfidf", keyword], {
+        cwd: path_1.default.resolve(__dirname, "./api"),
+    });
     let data = "";
+    search.stdout.on("data", data => { });
     try {
-        for (var _b = __asyncValues(pythonProcess.stdout), _c; _c = yield _b.next(), !_c.done;) {
+        for (var _b = __asyncValues(search.stdout), _c; _c = yield _b.next(), !_c.done;) {
             const chunk = _c.value;
             console.log("stdout chunk: " + chunk);
             data += chunk;
@@ -47,10 +50,21 @@ router.get("/api/search", (ctx) => __awaiter(void 0, void 0, void 0, function* (
         }
         finally { if (e_1) throw e_1.error; }
     }
-    ctx.response.body = `${keyword}: ${data}`;
+    ctx.response.body = `${data.toString()}`;
 }));
 app.use(router.routes());
 app.use((0, koa_static_1.default)(path_1.default.join(__dirname, "app/build")));
-app.listen(8080, () => {
-    console.log("http://localhost:8080/");
+const refresh_cache = (0, child_process_1.spawn)("python", ["test.py"], {
+    cwd: path_1.default.resolve(__dirname, "./api"),
+});
+new Promise((resolve, reject) => {
+    refresh_cache.on("close", resolve);
+}).then(code => {
+    if (code === 0) {
+        app.listen(8080, () => { });
+        console.log("http://localhost:8080/");
+    }
+    else {
+        console.log(`refresh_cache process exited with code ${code}`);
+    }
 });

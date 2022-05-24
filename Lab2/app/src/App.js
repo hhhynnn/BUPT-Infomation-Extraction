@@ -1,41 +1,62 @@
-import { Input, Layout, List, Typography } from 'antd';
-import { useState } from 'react';
+import { Space, Input, List, Typography, Divider } from "antd";
+import { useState } from "react";
 import "./App.css";
 
-const { Header, Footer, Content } = Layout;
-const { Text } = Typography;
 const { Search } = Input;
+const { Title, Paragraph, Text, Link } = Typography;
 
 function App() {
-  const [listData, setListData] = useState([])
+  const [listData, setListData] = useState([]);
 
-  const onSearch = async (value) => {
+  const onSearch = async value => {
     const response = await fetch(`api/search?q=${value}`);
-    const data = await response.text();
+    let data = await response.text();
+    try {
+      data = JSON.parse(data);
+    } catch (error) {
+      console.log(error);
+    }
     console.log(data);
-    setListData([data]);
-  }
+    setListData(data);
+  };
 
   return (
     <div className="App">
-      <Layout>
-        <Header>Header</Header>
-        <Content>
-          <Search placeholder="input search text" onSearch={onSearch} enterButton />
-          <List
-            header={<div>标题</div>}
-            footer={<div>尾注</div>}
-            bordered
-            dataSource={listData}
-            renderItem={item => (
-              <List.Item>
-                <Text mark>[震惊！]</Text> {item}
-              </List.Item>
-            )}
-          />
-        </Content>
-        <Footer>Footer</Footer>
-      </Layout>
+      <Space direction="vertical" size="middle" style={{ display: "flex" }}>
+        <Search
+          placeholder="input search text"
+          onSearch={onSearch}
+          enterButton
+        />
+        <List
+          header={<div>查询结果如下</div>}
+          footer={<div>查询结束</div>}
+          bordered
+          itemLayout="horizontal"
+          dataSource={listData}
+          renderItem={item => (
+            <List.Item>
+              <Typography>
+                <Title level={5}>{item.title}</Title>
+                <Paragraph>
+                  <Text>{item.time}</Text>
+                  <Divider type="vertical"></Divider>
+                  <Text>原文链接：</Text>
+                  <Link href={item.url}>{item.url}</Link>
+                </Paragraph>
+                <Paragraph
+                  ellipsis={{
+                    rows: 2,
+                    expandable: true,
+                  }}
+                >
+                  {item.relate}
+                </Paragraph>
+              </Typography>
+            </List.Item>
+          )}
+        />
+      </Space>
     </div>
   );
 }
