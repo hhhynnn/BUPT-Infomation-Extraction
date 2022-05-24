@@ -23,8 +23,9 @@ router.get("/api/search", async ctx => {
   ctx.response.body = `${keyword}: ${data}`;
 });
 
-app.use(router.routes()).use(staticResource(path.join(__dirname, "app/build")));
+app.use(router.routes());
+app.use(staticResource(path.join(__dirname, "app/build")));
 
-app.listen(8080);
-
-console.log("http://localhost:8080/");
+app.listen(8080, () => {
+  console.log("http://localhost:8080/");
+});
