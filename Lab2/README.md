@@ -82,3 +82,9 @@ node main.js
 ```shell
 chrome http://localhost:8080/
 ```
+
+## python 库依赖
+```shell
+pip install jieba
+
+```
