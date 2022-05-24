@@ -112,7 +112,10 @@ def search_by_tfidf():
             doc_set = set(index[word])
         except KeyError:
             doc_set = set()
-        idf_dict[word] = math.log10(doc_cnt / (1 + len(doc_set & article_set)))
+        try:
+            idf_dict[word] = math.log10(doc_cnt / (1 + len(doc_set & article_set)))
+        except ValueError:
+            idf_dict[word] = 0
 
     # 计算 tf-idf 向量
     tfidf_vec_dict = defaultdict(list)
