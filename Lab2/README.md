@@ -83,7 +83,20 @@ node main.js
 chrome http://localhost:8080/
 ```
 
-## python 库依赖
+## python 环境
+
+### 创建虚拟环境
+
+```shell
+virtualenv venv
+```
+
+### 启用虚拟环境
+```shell
+.\venv\Scripts\activate
+```
+### 下载依赖库
+
 ```shell
 pip install jieba
 
