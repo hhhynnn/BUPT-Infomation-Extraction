@@ -1,12 +1,28 @@
 ############################################################
-# 功能: 实现搜索
+# 功能: 检索
 # 参数1: 搜索算法 (可选: tfidf, bert)
 # 参数2: 搜索关键字
 # 返回值: list, 其中 list 的元素类型为 dict
 #        dict 格式为 {'title':xx, # 文章标题
 #                    'time' :xx, # 发布时间
 #                    'url:  :xx, # 原文链接
-#                    'relate':xx}# 相关位置
+#                    'relate':xx}# 相关内容
+#        relate 为列表, 分3段, 其中第二段为关键字 (第二段可以高亮显示)
+# 举例: 搜索 "治疗癌症的方法" 返回 json 如下
+# [{
+#      "title": "生孩子都能找AI帮忙？AI或助人类做出最优选择",
+#      "time": "2018年02月08日",
+#      "url": "https://huanqiukexue.com/a/qianyan/xinxi__nenyuan/2018/0208/27884.html",
+#      "relate": ["...对于患者及家属来说，不育症的", "治疗", "过程就像精神与经济的过山车。有许多尝试受孕的夫妇在试管婴..."]
+#   },
+#   {
+#      "title": "魔法蘑菇帮你甩掉烟瘾",
+#      "time": "2014年10月16日",
+#      "url": "https://huanqiukexue.com/plus/view.php?aid=24908",
+#      "relate": ["...分的存在）。在你跑到树林里开始愉快的自我", "治疗", "之前，你要知道，这些戒烟者还参加了一个认知行为的治疗项目..."]
+#   },
+#   ...
+#   ]
 ############################################################
 import json
 import math
@@ -16,7 +32,6 @@ import sqlite3
 from collections import defaultdict
 
 import jieba
-from debug_function import *
 from config import CACHE_PATH
 
 # 获取搜索关键词
@@ -65,8 +80,6 @@ for article in article_list:
         'content': article[7]
     }
 
-print(f"{timestamp()}# 预处理完成, 用时{runtime()}")
-
 
 ##################################################
 # mode = tfidf
@@ -103,7 +116,6 @@ def search_by_tfidf():
     std_vec = [idf_dict[key] for key in keywords]
     for i in article_ids:
         tfidf_vec_dict[i] = [tf_dict[i][key] * idf_dict[key] for key in keywords]
-    print(f"{timestamp()}# TF-IDF 计算完成, 用时{runtime()}")
 
     ##############################
     # 2. 计算向量内积
@@ -116,13 +128,10 @@ def search_by_tfidf():
         for idx in range(vec_len):
             sc_dict[i] += std_vec[idx] * i_vec[idx]
 
-    print(f"{timestamp()}# 向量内积计算完成, 用时{runtime()}")
-
     ##############################
     # 3. 结果排序并输出
     ##############################
     seq = sorted(sc_dict.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)
-    print(f"{timestamp()}# 排序计算完成, 用时{runtime()}")
     return seq
 
 
@@ -137,11 +146,8 @@ def search_by_bert():
 
 if mode == 'tfidf':
     result_id_list = search_by_tfidf()
-elif mode == 'bert':
-    result_id_list = search_by_bert()
 else:
-    result_id_list = []
-    print('param1 must be "tfidf" or "bert"')
+    result_id_list = search_by_bert()
 
 ##################################################
 # 根据排序返回要显示的内容
@@ -159,9 +165,10 @@ for i, sc in result_id_list:
         pos = content.find(key)
         begin = max(0, pos - 20)
         end = min(len(content), pos + 30)
-        relate = [f'...{content[begin:pos], content[pos:pos + len(key)]}', f'{content[pos + len(key):end]}...']
+        relate = [f'...{content[begin:pos]}', content[pos:pos + len(key)], f'{content[pos + len(key):end]}...']
         relate = [each.replace('\n', ' ') for each in relate[:]]
 
         d['relate'] = relate
         break
     result.append(d)
+print(json.dumps(result, ensure_ascii=False))

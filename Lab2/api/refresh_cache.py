@@ -9,7 +9,6 @@ import json
 import jieba
 import sqlite3
 from collections import defaultdict
-from debug_function import *
 from config import CACHE_PATH
 
 # 1. 读取数据库的所有文件
@@ -23,7 +22,6 @@ conn.commit()
 cursor.close()
 conn.close()
 
-print(f"{timestamp()}# 数据库读取完成, 用时{runtime()}")
 
 # 2. 构造倒排索引
 iv_index = defaultdict(list)  # 倒排索引
@@ -41,11 +39,9 @@ for article in articles:
         # 添加索引项
         iv_index[word].append(idx)
 
-print(f"{timestamp()}# 文件构造完成, 用时{runtime()}")
 
 # 3. 保存为json
 with open(CACHE_PATH, 'w', encoding='utf8') as f:
     d = {'index': iv_index, 'seg': seg_dict}
     f.write(json.dumps(d, ensure_ascii=False))
 
-print(f"{timestamp()}# 文件写入完成, 用时{runtime()}")
