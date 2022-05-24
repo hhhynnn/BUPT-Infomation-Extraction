@@ -53,7 +53,11 @@ node main.js
 or
 
 ```shell
+
 # 安装 typescript 直接运行 ts 代码
+
+# ps. 如果提示没有 ts-node 命令, 则先执行以下命令
+npm install -g ts-node
 
 yarn global add typescript # 只需要安装一次, 安装在用户 home 目录
 # yarn global remove typescript # 卸载 typescript

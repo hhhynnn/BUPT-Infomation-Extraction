@@ -32,6 +32,7 @@ import sqlite3
 from collections import defaultdict
 
 import jieba
+import jieba.analyse
 from config import CACHE_PATH
 
 sys.stdout.reconfigure(encoding='utf-8')
@@ -42,7 +43,8 @@ keywords_ori = re.split(r'\s+', keywords_ori)
 keywords = []
 for keyword in keywords_ori:
     # keywords.extend(jieba.lcut(keyword, cut_all=False)) # 简单拆解
-    keywords.extend(jieba.lcut_for_search(keyword))  # 搜索化拆解
+    # keywords.extend(jieba.lcut_for_search(keyword))  # 搜索化拆解
+    keywords.extend(jieba.analyse.extract_tags(keyword))  # 搜索化拆解
 
 # 读取倒排索引
 with open(CACHE_PATH, 'r', encoding='utf8') as f:
@@ -130,16 +132,21 @@ def search_by_tfidf():
     ##############################
     sc_dict = dict()  # 相似度字典
     vec_len = len(std_vec)  # 向量长度
+    std_vec_len = math.sqrt(sum([v * v for v in std_vec]))  # 标准向量模长
     for i in article_ids:
         sc_dict[i] = 0
         i_vec = tfidf_vec_dict[i]  # 向量 i
         for idx in range(vec_len):
             sc_dict[i] += std_vec[idx] * i_vec[idx]
+        sc_dict[i] /= std_vec_len
 
     ##############################
     # 3. 结果排序并输出
     ##############################
-    seq = sorted(sc_dict.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)
+    sc_dict_filtered = dict(filter(lambda kv: kv[1] > 1, sc_dict.items()))
+    sc_dict_filtered = sorted(sc_dict_filtered.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)
+    sc_dict_unfiltered = sorted(sc_dict.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)
+    seq = sc_dict_filtered if len(sc_dict_filtered) > 5 else sc_dict_unfiltered[:5]
     return seq
 
 

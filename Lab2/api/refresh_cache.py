@@ -33,8 +33,9 @@ for article in articles:
     content = article[7]
     # ss = f"{title} {abstract} {content}"
     # seg_list = jieba.lcut(ss, cut_all=False)
-    # seg_list = jieba.lcut(content, cut_all=False) # 简单提取
-    seg_list = jieba.analyse.extract_tags(content)
+    # seg_list = jieba.lcut(content, cut_all=False) # 精确提取
+    seg_list = jieba.lcut(content, cut_all=True)  # 全提取
+    # seg_list = jieba.analyse.extract_tags(content) # 关键词提取
 
     seg_dict[idx] = seg_list
     for word in set(seg_list):
