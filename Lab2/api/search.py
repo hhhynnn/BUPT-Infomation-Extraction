@@ -1,6 +1,6 @@
 ############################################################
 # 功能: 检索
-# 参数1: 搜索算法 (可选: tfidf, bert)
+# 参数1: 搜索算法 (可选: tfidf, bm25)
 # 参数2: 搜索关键字
 # 返回值: list, 其中 list 的元素类型为 dict
 #        dict 格式为 {'title':xx, # 文章标题
@@ -41,7 +41,8 @@ keywords_ori = sys.argv[2]
 keywords_ori = re.split(r'\s+', keywords_ori)
 keywords = []
 for keyword in keywords_ori:
-    keywords.extend(jieba.lcut(keyword, cut_all=False))
+    # keywords.extend(jieba.lcut(keyword, cut_all=False)) # 简单拆解
+    keywords.extend(jieba.lcut_for_search(keyword))  # 搜索化拆解
 
 # 读取倒排索引
 with open(CACHE_PATH, 'r', encoding='utf8') as f:
@@ -143,10 +144,10 @@ def search_by_tfidf():
 
 
 ##################################################
-# mode = bert
-# bert 检索算法实现
+# mode = bm25
+# bm25 检索算法实现
 ##################################################
-def search_by_bert():
+def search_by_bm25():
     return []
     pass
 
@@ -154,7 +155,7 @@ def search_by_bert():
 if mode == 'tfidf':
     result_id_list = search_by_tfidf()
 else:
-    result_id_list = search_by_bert()
+    result_id_list = search_by_bm25()
 
 ##################################################
 # 根据排序返回要显示的内容

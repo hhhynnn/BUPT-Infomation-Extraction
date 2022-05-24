@@ -7,6 +7,7 @@
 
 import json
 import jieba
+import jieba.analyse
 import sqlite3
 from collections import defaultdict
 from config import CACHE_PATH
@@ -22,7 +23,6 @@ conn.commit()
 cursor.close()
 conn.close()
 
-
 # 2. 构造倒排索引
 iv_index = defaultdict(list)  # 倒排索引
 seg_dict = defaultdict(list)  # 分词结果 [id->[word1, word2, ...]]
@@ -33,15 +33,15 @@ for article in articles:
     content = article[7]
     # ss = f"{title} {abstract} {content}"
     # seg_list = jieba.lcut(ss, cut_all=False)
-    seg_list = jieba.lcut(content, cut_all=False)
+    # seg_list = jieba.lcut(content, cut_all=False) # 简单提取
+    seg_list = jieba.analyse.extract_tags(content)
+
     seg_dict[idx] = seg_list
     for word in set(seg_list):
         # 添加索引项
         iv_index[word].append(idx)
 
-
 # 3. 保存为json
 with open(CACHE_PATH, 'w', encoding='utf8') as f:
     d = {'index': iv_index, 'seg': seg_dict}
     f.write(json.dumps(d, ensure_ascii=False))
-
