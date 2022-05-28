@@ -153,10 +153,40 @@ def search_by_tfidf():
 ##################################################
 # mode = bm25
 # bm25 检索算法实现
+# 1. 构造字典
+# 2. 构造bm25Model
+# 3. 搜索
 ##################################################
+import codecs
+from gensim import corpora
+from gensim.summarization import bm25
+
+
 def search_by_bm25():
-    return []
-    pass
+    ##############################
+    # 1. 构造字典
+    ##############################
+    corpus = []
+    for aid in article_ids:
+        corpus.append(seg_dict[f'{aid}'])
+    dictionary = corpora.Dictionary(corpus)
+
+    ##############################
+    # 2. 构造 bm25Model
+    ##############################
+    bm25Model = bm25.BM25(corpus)
+
+    ##############################
+    # 3. 搜索
+    ##############################
+    avg_idf = sum(bm25Model.idf.values()) / len(bm25Model.idf.values())
+    scores = bm25Model.get_scores(keywords, avg_idf)
+    sc_dict = dict(zip(article_ids, scores))
+    sc_dict_filtered = dict(filter(lambda kv: kv[1] > 4, sc_dict.items()))
+    sc_dict_filtered = sorted(sc_dict_filtered.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)
+    sc_dict_unfiltered = sorted(sc_dict.items(), key=lambda kv: (kv[1], kv[0]), reverse=True)
+    seq = sc_dict_filtered if len(sc_dict_filtered) > 5 else sc_dict_unfiltered[:5]
+    return seq
 
 
 if mode == 'tfidf':

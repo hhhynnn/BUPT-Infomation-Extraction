@@ -103,5 +103,6 @@ virtualenv venv
 
 ```shell
 pip install jieba
+pip install gensim==3.4.0
 
 ```
