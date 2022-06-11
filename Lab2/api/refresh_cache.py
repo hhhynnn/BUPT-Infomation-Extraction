@@ -12,18 +12,25 @@ import sqlite3
 from collections import defaultdict
 from config import CACHE_PATH
 
-# 1. 读取数据库的所有文件
+# 读取数据库的所有文件
 conn = sqlite3.connect('./res.db')
 cursor = conn.cursor()
 
 cursor.execute('select * from article')
 articles = cursor.fetchall()
 
+cursor.execute('select * from img')
+imgs = cursor.fetchall()
+
 conn.commit()
 cursor.close()
 conn.close()
 
-# 2. 构造倒排索引
+############################################################
+# 文档搜索倒排索引构造
+# 在 cache 中保存为index:{...}
+############################################################
+
 iv_index = defaultdict(list)  # 倒排索引
 seg_dict = defaultdict(list)  # 分词结果 [id->[word1, word2, ...]]
 for article in articles:
@@ -42,7 +49,25 @@ for article in articles:
         # 添加索引项
         iv_index[word].append(idx)
 
-# 3. 保存为json
+############################################################
+# 图片搜索倒排索引构造
+# 在 cache 中保存为img_index
+############################################################
+
+img_iv_index = defaultdict(list)  # 倒排索引
+img_seg_dict = defaultdict(list)  # 分词结果 [id->[word1, word2, ...]]
+for img in imgs:
+    idx = img[0]
+    des = img[1]
+    img_seg_list = jieba.lcut(des, cut_all=True)
+    img_seg_dict[idx] = img_seg_list  # 保存分词结果
+    for word in set(img_seg_list):
+        img_iv_index[word].append(idx)
+
+############################################################
+# 计算结果保存为json
+############################################################
 with open(CACHE_PATH, 'w', encoding='utf8') as f:
-    d = {'index': iv_index, 'seg': seg_dict}
+    d = {'index': iv_index, 'seg': seg_dict,
+         'img_index': img_iv_index, 'img_seg': img_seg_dict}
     f.write(json.dumps(d, ensure_ascii=False))
