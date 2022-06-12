@@ -1,4 +1,14 @@
-import { Divider, Input, List, Space, Tabs, Typography, Card } from "antd";
+import {
+  BackTop,
+  Card,
+  Divider,
+  Input,
+  List,
+  Radio,
+  Space,
+  Tabs,
+  Typography,
+} from "antd";
 import React, { useState } from "react";
 import "./App.css";
 
@@ -9,9 +19,15 @@ const { Title, Paragraph, Text, Link } = Typography;
 function App() {
   const [textListData, setTextListData] = useState([]);
   const [imgListData, setImgListData] = useState([]);
+  const [checked, setChecked] = useState("tfidf");
+
+  const onRadioChange = e => {
+    console.log("radio checked", e.target.value);
+    setChecked(e.target.value);
+  };
 
   const onSearch = async value => {
-    const response = await fetch(`api/search?q=${value}`);
+    const response = await fetch(`api/search?q=${value}&f=${checked}`);
     let data = await response.text();
     try {
       data = JSON.parse(data);
@@ -36,6 +52,7 @@ function App() {
 
   return (
     <div className="App">
+      <BackTop />
       <Tabs defaultActiveKey="1">
         <TabPane tab="文字搜索" key="1">
           <Space direction="vertical" size="middle" style={{ display: "flex" }}>
@@ -44,6 +61,10 @@ function App() {
               onSearch={onSearch}
               enterButton
             />
+            <Radio.Group onChange={onRadioChange} value={checked}>
+              <Radio value={"tfidf"}>tfidf</Radio>
+              <Radio value={"bm25"}>bm25</Radio>
+            </Radio.Group>
             <List
               header={<div>查询结果如下</div>}
               footer={<div>查询结束</div>}
