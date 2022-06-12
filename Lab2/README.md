@@ -96,9 +96,15 @@ virtualenv venv
 ```
 
 ### 启用虚拟环境
+
 ```shell
-.\venv\Scripts\activate
+./venv/Scripts/activate
 ```
+
+```powershell
+./venv/Scripts/activate.ps1
+```
+
 ### 下载依赖库
 
 ```shell

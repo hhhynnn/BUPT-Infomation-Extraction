@@ -1,11 +1,11 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "main.ts",
   "license": "MIT",
   "scripts": {
-    "serve": "ts-node main.ts",
-    "dev": "nodemon -e ts main.ts"
+    "start": "nodemon -e ts main.ts",
+    "serve": "ts-node main.ts"
   },
   "dependencies": {
     "koa": "^2.13.4",

@@ -11,8 +11,9 @@ router.redirect("/", "/index.html");
 
 router.get("/api/search", async ctx => {
   const keyword = ctx.query.q as string;
+  const method = (ctx.query.f as string) || "tfidf";
 
-  await call("python", ["search.py", "tfidf", keyword], {
+  await call("python", ["search.py", method, keyword], {
     cwd: path.resolve(__dirname, "./api"),
   })
     .then(({ code, str }) => {
@@ -28,6 +29,27 @@ router.get("/api/search", async ctx => {
     .catch(console.log);
 });
 
+router.get("/api/searchimg", async ctx => {
+  const keyword = ctx.query.q as string;
+
+  await call("python", ["search_img.py", keyword], {
+    cwd: path.resolve(__dirname, "./api"),
+  })
+    .then(({ code, str }) => {
+      console.log(`"python search_img.py ${keyword}" exited with code ${code}`);
+      if (code !== 0) {
+        return;
+      }
+      console.log(str.slice(0, 30) + "..." + (str.length - 30) + " chars");
+      ctx.response.body = `${str}`;
+    })
+    .catch(console.log);
+});
+
+app.use(async (ctx, next) => {
+  console.log(ctx.URL);
+  await next();
+});
 app.use(router.routes());
 app.use(staticResource(path.join(__dirname, "app/build")));
 
