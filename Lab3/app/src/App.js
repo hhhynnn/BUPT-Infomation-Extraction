@@ -77,7 +77,7 @@ function App() {
                     <Title level={5}>{item.title}</Title>
                     <Paragraph>
                       <Text>{item.time}</Text>
-                      <Divider type="vertical"></Divider>
+                      <Divider type="vertical" />
                       <Text>原文链接：</Text>
                       <Link href={item.url} target="_blank">
                         {item.url}
@@ -89,7 +89,39 @@ function App() {
                         expandable: true,
                       }}
                     >
-                      {item.relate}
+                      <Text>相关内容</Text>： {item.relate}
+                    </Paragraph>
+                    <Paragraph>
+                      <Text>机构名称：</Text>
+                      <Space split={<Divider type="vertical" />} wrap>
+                        {item.org.map((v, index) => (
+                          <Text key={index}>{v}</Text>
+                        ))}
+                      </Space>
+                    </Paragraph>
+                    <Paragraph>
+                      <Text>人名：</Text>
+                      <Space split={<Divider type="vertical" />} wrap>
+                        {item.name.map((v, index) => (
+                          <Text key={index}>{v}</Text>
+                        ))}
+                      </Space>
+                    </Paragraph>
+                    <Paragraph>
+                      <Text>地址：</Text>
+                      <Space split={<Divider type="vertical" />} wrap>
+                        {item.address.map((v, index) => (
+                          <Text key={index}>{v}</Text>
+                        ))}
+                      </Space>
+                    </Paragraph>
+                    <Paragraph>
+                      <Text>链接：</Text>
+                      <Space split={<Divider type="vertical" />} wrap>
+                        {item.urls.map((v, index) => (
+                          <Text key={index}>{v}</Text>
+                        ))}
+                      </Space>
                     </Paragraph>
                   </Typography>
                 </List.Item>
