@@ -110,5 +110,8 @@ virtualenv venv
 ```shell
 pip install jieba
 pip install gensim==3.4.0
+pip install zhon
+pip instal torch
+pip install  sklearn_crfsuite
 
 ```

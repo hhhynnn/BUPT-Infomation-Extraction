@@ -6,23 +6,44 @@
 #        dict 格式为 {'title':xx, # 文章标题
 #                    'time' :xx, # 发布时间
 #                    'url:  :xx, # 原文链接
-#                    'relate':xx}# 相关内容
+#                    'relate':xx, # 相关内容
+#                    'org':xx,   # 机构名称
+#                    'name':xx,  # 人名
+#                    'address':xx, # 地址
+#                    'urls':xx   # 链接
 #        relate 为列表, 分3段, 其中第二段为关键字 (第二段可以高亮显示)
-# 举例: 搜索 "治疗癌症的方法" 返回 json 如下
-# [{
-#      "title": "生孩子都能找AI帮忙？AI或助人类做出最优选择",
-#      "time": "2018年02月08日",
-#      "url": "https://huanqiukexue.com/a/qianyan/xinxi__nenyuan/2018/0208/27884.html",
-#      "relate": ["...对于患者及家属来说，不育症的", "治疗", "过程就像精神与经济的过山车。有许多尝试受孕的夫妇在试管婴..."]
-#   },
-#   {
-#      "title": "魔法蘑菇帮你甩掉烟瘾",
-#      "time": "2014年10月16日",
-#      "url": "https://huanqiukexue.com/plus/view.php?aid=24908",
-#      "relate": ["...分的存在）。在你跑到树林里开始愉快的自我", "治疗", "之前，你要知道，这些戒烟者还参加了一个认知行为的治疗项目..."]
-#   },
-#   ...
-#   ]
+# 举例: 搜索 传递参数 tfidf "可持续发展" 返回 json 如下
+#
+# {
+#     "title": "3D打印产业峰会聚焦前沿技术，3D打印数字维创中心正式启幕！",
+#     "time": "2018年01月02日",
+#     "url": "https://huanqiukexue.com/a/qianyan/cailiao__huaxue/2018/0102/27705.html",
+#     "relate": [
+#         "...数字创意，打印未来”——3D打印产业创新",
+#         "发展",
+#         "高峰论坛隆重开启，此次论坛由中关村科技园区丰台园管理委员..."
+#     ],
+#     "org": [
+#         "北京丰台科技园建设发展有限公司丰科博创北京科技服务有限公司",
+#         "管委会",
+#         "中关村科技园区丰台园管委会工委委员北京丰台科技园建设发展有限公司",
+#         "上海交通大学医学3D打印创新研究中心",
+#         "乔治华盛顿大学",
+#     ],
+#     "name": [
+#         "孙睿",
+#         "石岩刘亚凡",
+#         "陈玉涛陈玉涛",
+#         "何镜堂",
+#     ],
+#     "address": [
+#         "中关村科技园区丰台园3D打印数字维创中心",
+#         "中关村科技园区丰台园3D打印数字维创中心姚京",
+#         "高新科技园区",
+#         "中关村丰台区",
+#     ],
+#     "urls": [],
+# },
 ############################################################
 import json
 import math
@@ -31,14 +52,20 @@ import sys
 import sqlite3
 from collections import defaultdict
 
-import jieba
 import jieba.analyse
 from config import CACHE_PATH
+from sys import path
 
+# 信息抽取库
+path.append(sys.path[0] + '\\NER')
+from NER import main
+
+# >>> 获取搜索关键词
 sys.stdout.reconfigure(encoding='utf-8')
-# 获取搜索关键词
 mode = sys.argv[1]
 keywords_ori = sys.argv[2]
+# 获取搜索关键词 <<<
+
 keywords_ori = re.split(r'\s+', keywords_ori)
 keywords = []
 for keyword in keywords_ori:
@@ -199,21 +226,26 @@ else:
 ##################################################
 result = []
 for i, sc in result_id_list:
-    d = {'title': article_dict[i]['title'],
-         'time': article_dict[i]['time'],
-         'url': article_dict[i]['url']
-         }
+    d = {
+        'title': article_dict[i]['title'],
+        'time': article_dict[i]['time'],
+        'url': article_dict[i]['url']
+    }
     for key in keywords:
         if key not in seg_dict[f'{i}']:
             continue
         content = article_dict[i]['content']
+        d['org'], d['name'], d['address'], d['urls'] = main.extract(content)
         pos = content.find(key)
         begin = max(0, pos - 20)
         end = min(len(content), pos + 30)
         relate = [f'...{content[begin:pos]}', content[pos:pos + len(key)], f'{content[pos + len(key):end]}...']
         relate = [each.replace('\n', ' ') for each in relate[:]]
-
         d['relate'] = relate
+        # 格式化信息抽取情况
+        for key in ['org', 'name', 'address', 'urls']:
+            for idx, ss in enumerate(d[key]):
+                d[key][idx] = ss.replace('\n',' ')
         break
     result.append(d)
-print(json.dumps(result, ensure_ascii=False))
+print(json.dumps(result, ensure_ascii=False, indent=4, separators=(',', ':')))

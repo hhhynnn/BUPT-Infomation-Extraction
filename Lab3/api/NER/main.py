@@ -20,7 +20,7 @@ def extract(model_input):
     test_word_lists = [list(i) for i in test_word_lists]
     # 训练评估CRF模型
     # print("CRF模型")
-    CRF_MODEL_PATH = 'Lab3/api/NER/ckpts/crf.pkl'
+    CRF_MODEL_PATH = './NER/ckpts/crf.pkl'
     crf_model = load_model(CRF_MODEL_PATH)
     crf_pred = crf_model.test(test_word_lists)
 
