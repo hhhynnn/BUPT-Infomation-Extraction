@@ -3,19 +3,22 @@
 # 参数1: 搜索算法 (可选: tfidf, bm25)
 # 参数2: 搜索关键字
 # 返回值: list, 其中 list 的元素类型为 dict
-#        dict 格式为 {'title':xx, # 文章标题
+#        dict 格式为 {'id':xx     # 文章id(6.25更新)
+#                    'title':xx, # 文章标题
 #                    'time' :xx, # 发布时间
 #                    'url:  :xx, # 原文链接
 #                    'relate':xx}# 相关内容
 #        relate 为列表, 分3段, 其中第二段为关键字 (第二段可以高亮显示)
 # 举例: 搜索 "治疗癌症的方法" 返回 json 如下
 # [{
+#      "id":26,
 #      "title": "生孩子都能找AI帮忙？AI或助人类做出最优选择",
 #      "time": "2018年02月08日",
 #      "url": "https://huanqiukexue.com/a/qianyan/xinxi__nenyuan/2018/0208/27884.html",
 #      "relate": ["...对于患者及家属来说，不育症的", "治疗", "过程就像精神与经济的过山车。有许多尝试受孕的夫妇在试管婴..."]
 #   },
 #   {
+#      "id":79,
 #      "title": "魔法蘑菇帮你甩掉烟瘾",
 #      "time": "2014年10月16日",
 #      "url": "https://huanqiukexue.com/plus/view.php?aid=24908",
@@ -75,6 +78,7 @@ conn.close()
 article_dict = dict()
 for article in article_list:
     article_dict[article[0]] = {
+        'id':article[0],
         'title': article[1],
         'time': article[2],
         'author': article[3],
@@ -199,7 +203,8 @@ else:
 ##################################################
 result = []
 for i, sc in result_id_list:
-    d = {'title': article_dict[i]['title'],
+    d = {'id':article_dict[i]['id'],
+        'title': article_dict[i]['title'],
          'time': article_dict[i]['time'],
          'url': article_dict[i]['url']
          }
