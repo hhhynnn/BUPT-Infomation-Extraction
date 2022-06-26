@@ -19,6 +19,31 @@ const { Title, Paragraph, Text, Link } = Typography;
 function MoreInfo(params) {
   console.log(params);
   const [count, setCount] = useState(params.count);
+  const expend = () => {
+    if (params.count >= params.item.length) {
+      return null;
+    } else if (count < params.item.length) {
+      return (
+        <Link
+          onClick={() => {
+            setCount(params.item.length);
+          }}
+        >
+          展开
+        </Link>
+      );
+    } else {
+      return (
+        <Link
+          onClick={() => {
+            setCount(params.count);
+          }}
+        >
+          折叠
+        </Link>
+      );
+    }
+  };
 
   return (
     <Paragraph>
@@ -27,31 +52,7 @@ function MoreInfo(params) {
         {params.item.slice(0, count).map((v, index) => (
           <Text key={index}>{v}</Text>
         ))}
-        {(() => {
-          if (params.item.length === 0) {
-            return null;
-          } else if (count < params.item.length) {
-            return (
-              <Link
-                onClick={() => {
-                  setCount(Infinity);
-                }}
-              >
-                展开
-              </Link>
-            );
-          } else {
-            return (
-              <Link
-                onClick={() => {
-                  setCount(params.count);
-                }}
-              >
-                折叠
-              </Link>
-            );
-          }
-        })()}
+        {expend()}
       </Space>
     </Paragraph>
   );
