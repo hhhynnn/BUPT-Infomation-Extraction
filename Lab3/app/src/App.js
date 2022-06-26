@@ -19,7 +19,10 @@ const { Title, Paragraph, Text, Link } = Typography;
 function MoreInfo(params) {
   console.log(params);
   const [count, setCount] = useState(params.count);
-  const expend = () => {
+  if (params.item.length === 0) {
+    return null;
+  }
+  function expend() {
     if (params.count >= params.item.length) {
       return null;
     } else if (count < params.item.length) {
@@ -43,7 +46,7 @@ function MoreInfo(params) {
         </Link>
       );
     }
-  };
+  }
 
   return (
     <Paragraph>
