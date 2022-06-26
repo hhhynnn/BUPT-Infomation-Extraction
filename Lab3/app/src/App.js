@@ -16,6 +16,47 @@ const { TabPane } = Tabs;
 const { Search } = Input;
 const { Title, Paragraph, Text, Link } = Typography;
 
+function MoreInfo(params) {
+  console.log(params);
+  const [count, setCount] = useState(params.count);
+
+  return (
+    <Paragraph>
+      <Text>{params.title}：</Text>
+      <Space split={<Divider type="vertical" />} wrap>
+        {params.item.slice(0, count).map((v, index) => (
+          <Text key={index}>{v}</Text>
+        ))}
+        {(() => {
+          if (params.item.length === 0) {
+            return null;
+          } else if (count < params.item.length) {
+            return (
+              <Link
+                onClick={() => {
+                  setCount(Infinity);
+                }}
+              >
+                展开
+              </Link>
+            );
+          } else {
+            return (
+              <Link
+                onClick={() => {
+                  setCount(params.count);
+                }}
+              >
+                折叠
+              </Link>
+            );
+          }
+        })()}
+      </Space>
+    </Paragraph>
+  );
+}
+
 function App() {
   const [textListData, setTextListData] = useState([]);
   const [imgListData, setImgListData] = useState([]);
@@ -91,38 +132,10 @@ function App() {
                     >
                       <Text>相关内容</Text>： {item.relate}
                     </Paragraph>
-                    <Paragraph>
-                      <Text>机构名称：</Text>
-                      <Space split={<Divider type="vertical" />} wrap>
-                        {item.org.map((v, index) => (
-                          <Text key={index}>{v}</Text>
-                        ))}
-                      </Space>
-                    </Paragraph>
-                    <Paragraph>
-                      <Text>人名：</Text>
-                      <Space split={<Divider type="vertical" />} wrap>
-                        {item.name.map((v, index) => (
-                          <Text key={index}>{v}</Text>
-                        ))}
-                      </Space>
-                    </Paragraph>
-                    <Paragraph>
-                      <Text>地址：</Text>
-                      <Space split={<Divider type="vertical" />} wrap>
-                        {item.address.map((v, index) => (
-                          <Text key={index}>{v}</Text>
-                        ))}
-                      </Space>
-                    </Paragraph>
-                    <Paragraph>
-                      <Text>链接：</Text>
-                      <Space split={<Divider type="vertical" />} wrap>
-                        {item.urls.map((v, index) => (
-                          <Text key={index}>{v}</Text>
-                        ))}
-                      </Space>
-                    </Paragraph>
+                    <MoreInfo title="机构名称" item={item.org} count={5} />
+                    <MoreInfo title="人名" item={item.name} count={5} />
+                    <MoreInfo title="地址" item={item.address} count={5} />
+                    <MoreInfo title="链接" item={item.urls} count={5} />
                   </Typography>
                 </List.Item>
               )}
